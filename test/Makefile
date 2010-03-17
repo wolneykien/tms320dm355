@@ -8,3 +8,4 @@ clean:
 
 install:
 	install -D -m0755 apm_test $(PREFIX)/bin/apm_test
+	install -D -m0755 apm_run_tests $(PREFIX)/bin/apm_run_tests
