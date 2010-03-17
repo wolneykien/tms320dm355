@@ -26,10 +26,11 @@
 #include <linux/init.h>
 #include <linux/completion.h>
 
-#include <asm/apm.h> /* apm_power_info */
+#include "apm.h" /* apm_power_info */
 #include <asm/system.h>
 #include <asm/delay.h>
-#include <asm/arch/hardware.h>
+#include <mach/hardware.h>
+#include <mach/io.h>
 
 
 /*
@@ -266,6 +267,7 @@ static unsigned int apm_poll(struct file *fp, poll_table * wait)
  *   sprufb3.pdf
  *   table 6-3,6-4, page 44
  */
+#define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
 #define PDCTL1      __REG(0x01c40900)
 #define PLL1_PLLM   __REG(0x01c40910)
 
@@ -614,9 +616,9 @@ static int __init apm_init(void)
 		return ret;
 	}
 
-#ifdef CONFIG_PROC_FS
-	create_proc_info_entry("apm", 0, NULL, apm_get_info);
-#endif
+//#ifdef CONFIG_PROC_FS
+//	create_proc_info_entry("apm", 0, NULL, apm_get_info);
+//#endif
 
 	ret = misc_register(&apm_device);
 	if (ret != 0) {
