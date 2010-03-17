@@ -25,8 +25,13 @@
 
 #ifdef DEBUG
 #define DBG(fmt,args...) printk(KERN_DEBUG DRIVER_NAME ": " fmt , ## args)
+#define DBG_REG_FROM(name,val0) \
+  printk(KERN_DEBUG DRIVER_NAME ": 0x%x 0x%lx ->", name, val0)
+#define DBG_REG_TO(val) printk(" 0x%lx\n", val)
 #else
 #define DBG(fmt,args...) do { } while (0)
+#define DBG_REG_FROM(name,val0) do { } while (0)
+#define DBG_REG_TO(val) do { } while (0)
 #endif
 
 #define ERROR(fmt,args...) printk(KERN_ERR DRIVER_NAME ": " fmt , ## args)
@@ -44,8 +49,11 @@ static const char driver_version[] = "1.1";	/* no spaces */
  *
  */
 #define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
-#define PDCTL1      __REG(0x01c40900)
-#define PLL1_PLLM   __REG(0x01c40910)
+
+#define PDCTL1_ADDR 0x01c40900
+#define PDCTL1      __REG(PDCTL1_ADDR)
+#define PLL1_ADDR   0x01c40910
+#define PLL1_PLLM   __REG(PLL1_ADDR)
 
 // PDCTL register bits
 #define PLLEN		0
@@ -59,14 +67,15 @@ static const char driver_version[] = "1.1";	/* no spaces */
  *  sprueh7d.pdf 
  *  table 22, page 46
  */
-#define SDRCR       __REG(0x2000000c)
+#define SDRCR_ADDR  0x2000000c
+#define SDRCR       __REG(SDRCR_ADDR)
 
 /*
  *  sprufb3.pdf
  *  table 9-3, page 117
  */
-#define USBCTL      __REG(0x01c40034)
-
+#define USBCTL_ADDR 0x01c40034
+#define USBCTL      __REG(USBCTL_ADDR)
 
 static int
 apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
@@ -128,6 +137,8 @@ apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
 	case APM_IOC_USB_ON:
 		USBCTL &= ~( 1);
 		break;
+	default:
+	  return -EINVAL;
 	}
 
 	return 0;
