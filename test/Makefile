@@ -1,4 +1,6 @@
-all: apm_test.c
+all: apm_test
+
+apm_test: apm_test.c
 	$(CROSS_COMPILE)gcc -o apm_test apm_test.c
 
 clean:
