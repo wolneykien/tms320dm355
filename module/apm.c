@@ -7,8 +7,11 @@
 #include <linux/kernel.h>
 
 #include <asm/system.h>
-#include <asm/delay.h>
 #include <asm/arch/hardware.h>
+#include <linux/delay.h>
+
+/* Include PSC memory map definitions */
+#include "psc.h"
 
 #define DRIVER_NAME "apm"
 
@@ -37,6 +40,108 @@ static const char driver_version[] = "1.1";	/* no spaces */
  * apm_ioctl - handle APM ioctl
  *
  */
+
+/* Returns the value of a given PSC register (offset) */
+static unsigned long read_psc(unsigned long offs)
+{
+  return __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs);
+}
+
+/* Sets the value of a given PSC register (offset) */
+static void write_psc(unsigned long offs, unsigned long val)
+{
+  __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs) = val;
+}
+
+/* Sets and return the value of a given PSC register (offset) */
+static unsigned long write_read_psc(unsigned long offs, unsigned long val)
+{
+  write_psc(offs, val);
+  return read_psc(offs);
+}
+
+/* Tests the value of a given register (offset) with a bit-mask */
+static int test_psc(unsigned long offs, unsigned long mask)
+{
+  return read_psc(offs) & mask;
+}
+
+/* Reads the partial value of a PSC register (offset) */
+static unsigned long read_psc_part(unsigned long offs, unsigned long mask)
+{
+  return read_psc(offs) & mask;
+}
+
+/* Sets the partial value of a given PSC register (offset) */
+static void write_psc_part(unsigned long offs,
+			   unsigned long mask,
+			   unsigned long val)
+{
+  write_psc(offs, (read_psc(offs) & ~mask) | (val & mask));
+}
+
+/* Sets and returns the partial value of a given PSC register (offset) */
+static unsigned long write_read_psc_part(unsigned long offs,
+					 unsigned long mask,
+					 unsigned long val)
+{
+  write_psc_part(offs, mask, val);
+  return read_psc_part(offs, mask);
+}
+
+/* Sets the partial value of a given PSC register (offset) and returns
+ * the whole value */
+static unsigned long write_psc_part_read(unsigned long offs,
+					 unsigned long mask,
+					 unsigned long val)
+{
+  write_psc_part(offs, mask, val);
+  return read_psc(offs);
+}
+
+/* Waits for a module state transition to finish up */
+static int wait_for_transitions(void)
+{
+  while (test_psc(PTSTAT, PTSTAT_GOSTAT)) {
+    mdelay(100);
+  }
+
+  return 0;
+}
+
+/* Sets the value for next state a given module (number) */
+static void set_next_module_state(int mdnum, unsigned long mdstate)
+{
+  write_psc_part(MDCTL + REGISTER_SIZE * mdnum, MDCTL_NEXT, mdstate);
+}
+
+/* Initiates the module state transition */
+static void start_module_state_transition(void)
+{
+  write_psc_part(PTCMD, PTCMD_GO, 0x1);
+}
+
+/* Transites a module (number) to a given state */
+static int change_module_state(int mdnum, unsigned long mdstate)
+{
+  int rc;
+  /* Wait for the GOSTATx bit in PTSTAT to clear to 0x0. You must wait
+   * for any previously initiated transitions to finish before
+   * initiating a new transition. */
+  if ((rc = wait_for_transitions()) == 0) {
+    /* Set the NEXT bit in MDCTL[x] to SwRstDisable (0x0),
+     * SyncReset (0x1), Disable (0x2), or Enable (0x3). */
+    set_next_module_state(mdnum, mdstate);
+    /* Set the GOx bit in PTCMD to 0x1 to initiate the transition(s). */
+    start_module_state_transition();
+    /* Wait for the GOSTATx bit in PTSTAT to clear to 0x0. The module
+     * is only safely in the new state after the GOSTATx bit in
+     * PTSTAT clears to 0x0. */
+    rc = wait_for_transitions();
+  }
+
+  return rc;
+}
 
 #define PDCTL1_ADDR 0x01c40900
 #define PDCTL1      __REG(PDCTL1_ADDR)
