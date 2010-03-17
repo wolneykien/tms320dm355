@@ -11,6 +11,9 @@
 #include <mach/hardware.h>
 #include <mach/io.h>
 
+/* Include PSC memory map definitions */
+#include "psc.h"
+
 #define DRIVER_NAME "apm"
 
 #ifdef DEBUG
@@ -39,6 +42,31 @@ static const char driver_version[] = "1.1";	/* no spaces */
  *
  */
 #define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
+
+/* Returns the value of a given PSC register (offset) */
+static unsigned long read_psc(unsigned long offs)
+{
+  return __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs);
+}
+
+/* Sets the value of a given PSC register (offset) */
+static void write_psc(unsigned long offs, unsigned long val)
+{
+  __REG(DAVINCHI_PWR_SLEEP_CNTRL_BASE + offs) = val;
+}
+
+/* Sets and return the value of a given PSC register (offset) */
+static unsigned long write_read_psc(unsigned long offs, unsigned long val)
+{
+  write_psc(offs, val);
+  return read_psc(offs);
+}
+
+/* Tests the value of a given register (offset) with a bit-mask */
+static int test_psc(unsigned long offs, unsigned long mask)
+{
+  return read_psc(offs) & mask;
+}
 
 #define PDCTL1_ADDR 0x01c40900
 #define PDCTL1      __REG(PDCTL1_ADDR)
