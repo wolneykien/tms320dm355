@@ -189,6 +189,24 @@ xb/*
 #define MDSTAT		0x800
 #define MDCTL		0xA00
 
-#define MDSTAT_STATE_MASK 0x1f
+/* Common register size */
+#define REGISTER_SIZE sizeof(unsigned long)
+
+/* PTSTAT bit-map */
+#define PTSTAT_GOSTAT 0x1
+
+/* MDCTL bit-map */
+#define MDCTL_NEXT 0x1f
+#define MDCTL_EMURSTIE 0x200
+#define MDCTL_EMUIHBIE 0x400
+
+/* Module state set */
+#define PSC_MD_ENABLE 0x3
+#define PSC_MD_DISABLE 0x2
+#define PSC_MD_SYNC_RESET 0x1
+#define PSC_MD_SWRST_DISABLE 0x0
+
+/* PTCMD bit-map */
+#define PTCMD_GO 0x1
 
 #endif /* __ASM_ARCH_PSC_H */

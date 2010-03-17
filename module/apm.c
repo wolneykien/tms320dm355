@@ -101,6 +101,50 @@ static unsigned long write_psc_part_read(unsignedlong offs,
   return read_psc(offs);
 }
 
+/* Waits for a module state transition to finish up */
+static int wait_for_transitions()
+{
+  while (test_psc(PTSTAT, PTSTAT_GOSTAT)) {
+    mdelay(100);
+  }
+
+  return 0;
+}
+
+/* Sets the value for next state a given module (number) */
+static void set_next_module_state(int mdnum, unsigned long mdstate)
+{
+  write_psc_part(MDCTL + REGISTER_SIZE * mdnum, MDCTL_NEXT, mdstate);
+}
+
+/* Initiates the module state transition */
+static void start_module_state_transition()
+{
+  write_psc_part(PTCMD, PTCMD_GO, 0x1);
+}
+
+/* Transites a module (number) to a given state */
+static int change_module_state(int mdnum, unsigned long mdstate)
+{
+  int rc;
+  /* Wait for the GOSTATx bit in PTSTAT to clear to 0x0. You must wait
+   * for any previously initiated transitions to finish before
+   * initiating a new transition. */
+  if ((rc = wait_for_transitions()) == 0) {
+    /* Set the NEXT bit in MDCTL[x] to SwRstDisable (0x0),
+     * SyncReset (0x1), Disable (0x2), or Enable (0x3). */
+    set_next_module_state(mdnum, mdstate);
+    /* Set the GOx bit in PTCMD to 0x1 to initiate the transition(s). */
+    start_module_state_transition();
+    /* Wait for the GOSTATx bit in PTSTAT to clear to 0x0. The module
+     * is only safely in the new state after the GOSTATx bit in
+     * PTSTAT clears to 0x0. */
+    rc = wait_for_transitions();
+  }
+
+  return rc;
+}
+
 #define PDCTL1_ADDR 0x01c40900
 #define PDCTL1      __REG(PDCTL1_ADDR)
 #define PLL1_ADDR   0x01c40910
