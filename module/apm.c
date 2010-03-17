@@ -1,21 +1,11 @@
 
 #include <linux/module.h>
-#include <linux/poll.h>
-#include <linux/timer.h>
-#include <linux/slab.h>
 #include <linux/proc_fs.h>
 #include <linux/miscdevice.h>
-#include "apm_bios.h"
-#include <linux/capability.h>
-#include <linux/sched.h>
-#include <linux/pm.h>
+#include "../ioctl.h"
 #include <linux/device.h>
 #include <linux/kernel.h>
-#include <linux/list.h>
-#include <linux/init.h>
-#include <linux/completion.h>
 
-#include "apm.h" /* apm_power_info */
 #include <asm/system.h>
 #include <asm/delay.h>
 #include <mach/hardware.h>
