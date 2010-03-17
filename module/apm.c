@@ -68,6 +68,39 @@ static int test_psc(unsigned long offs, unsigned long mask)
   return read_psc(offs) & mask;
 }
 
+/* Reads the partial value of a PSC register (offset) */
+static unsigned long read_psc_part(unsigned long offs, unsigned long mask)
+{
+  return read_psc(offs) & mask;
+}
+
+/* Sets the partial value of a given PSC register (offset) */
+static void write_psc_part(unsigned long offs,
+			   unsigned long mask,
+			   unsigned long val)
+{
+  write_psc(offs, read_psc(offs) & ~mask | val & mask);
+}
+
+/* Sets and returns the partial value of a given PSC register (offset) */
+static unsigned long write_read_psc_part(unsignedlong offs,
+					 unsigned long mask,
+					 unsigned long val)
+{
+  write_psc_part(offs, mask, val);
+  return read_psc_part(offs, mask);
+}
+
+/* Sets the partial value of a given PSC register (offset) and returns
+ * the whole value */
+static unsigned long write_psc_part_read(unsignedlong offs,
+					 unsigned long mask,
+					 unsigned long val)
+{
+  write_psc_part(offs, mask, val);
+  return read_psc(offs);
+}
+
 #define PDCTL1_ADDR 0x01c40900
 #define PDCTL1      __REG(PDCTL1_ADDR)
 #define PLL1_ADDR   0x01c40910
