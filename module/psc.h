@@ -1,4 +1,4 @@
-xb/*
+/*
  *  DaVinci Power & Sleep Controller (PSC) defines
  *
  *  Copyright (C) 2006 Texas Instruments.

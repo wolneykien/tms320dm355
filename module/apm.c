@@ -7,7 +7,7 @@
 #include <linux/kernel.h>
 
 #include <asm/system.h>
-#include <asm/delay.h>
+#include <linux/delay.h>
 #include <mach/hardware.h>
 #include <mach/io.h>
 
@@ -52,7 +52,7 @@ static unsigned long read_psc(unsigned long offs)
 /* Sets the value of a given PSC register (offset) */
 static void write_psc(unsigned long offs, unsigned long val)
 {
-  __REG(DAVINCHI_PWR_SLEEP_CNTRL_BASE + offs) = val;
+  __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs) = val;
 }
 
 /* Sets and return the value of a given PSC register (offset) */
@@ -79,11 +79,11 @@ static void write_psc_part(unsigned long offs,
 			   unsigned long mask,
 			   unsigned long val)
 {
-  write_psc(offs, read_psc(offs) & ~mask | val & mask);
+  write_psc(offs, (read_psc(offs) & ~mask) | (val & mask));
 }
 
 /* Sets and returns the partial value of a given PSC register (offset) */
-static unsigned long write_read_psc_part(unsignedlong offs,
+static unsigned long write_read_psc_part(unsigned long offs,
 					 unsigned long mask,
 					 unsigned long val)
 {
@@ -93,7 +93,7 @@ static unsigned long write_read_psc_part(unsignedlong offs,
 
 /* Sets the partial value of a given PSC register (offset) and returns
  * the whole value */
-static unsigned long write_psc_part_read(unsignedlong offs,
+static unsigned long write_psc_part_read(unsigned long offs,
 					 unsigned long mask,
 					 unsigned long val)
 {
@@ -102,7 +102,7 @@ static unsigned long write_psc_part_read(unsignedlong offs,
 }
 
 /* Waits for a module state transition to finish up */
-static int wait_for_transitions()
+static int wait_for_transitions(void)
 {
   while (test_psc(PTSTAT, PTSTAT_GOSTAT)) {
     mdelay(100);
@@ -118,7 +118,7 @@ static void set_next_module_state(int mdnum, unsigned long mdstate)
 }
 
 /* Initiates the module state transition */
-static void start_module_state_transition()
+static void start_module_state_transition(void)
 {
   write_psc_part(PTCMD, PTCMD_GO, 0x1);
 }
