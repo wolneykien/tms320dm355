@@ -68,7 +68,7 @@ int main (int narg, char **argv, char **arge)
 	fd = open("/dev/misc/apm_bios",O_NONBLOCK | O_RDWR);
 	if (0 >= fd)
 	{
-		printf("can not open /dev/apm\n");
+		printf("can not open /dev/apm_bios\n");
 		return fd;
 	}
 
