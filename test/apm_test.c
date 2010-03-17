@@ -3,15 +3,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-
-#define APM_IOC_PLLM_91 4
-#define APM_IOC_PLLM_179 8
-#define APM_IOC_USB_OFF 16
-#define APM_IOC_USB_ON 32
-#define APM_IOC_DDRSR_ON 64
-#define APM_IOC_DDRSR_OFF 128
-#define APM_IOC_PLLM_BYPASS 256
-#define APM_IOC_PLLM_PLL 512
+#include "../ioctl.h"
 
 int main (int narg, char **argv, char **arge)
 {
@@ -68,7 +60,7 @@ int main (int narg, char **argv, char **arge)
 	fd = open("/dev/misc/apm_bios",O_NONBLOCK | O_RDWR);
 	if (0 >= fd)
 	{
-		printf("can not open /dev/apm_bios\n");
+		printf("can not open /dev/misc/apm_bios\n");
 		return fd;
 	}
 
