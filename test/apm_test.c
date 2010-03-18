@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DEV "/dev/misc/apm_bios"
+#define DEV "/dev/misc/psc"
 
 int main (int narg, char **argv, char **arge)
 {
