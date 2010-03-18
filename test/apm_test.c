@@ -14,20 +14,22 @@ int main (int narg, char **argv, char **arge)
   unsigned long mdstate;
   int rc;
 
-  if (narg == 3) {
+  if (narg >= 2) {
     mdnum = atoi(argv[1]);
-    mdstate = (unsigned long)atoi(argv[2]);
+    if (narg > 2) {
+      mdstate = (unsigned long)atoi(argv[2]);
+    } else {
+      mdstate = 0xff;
+    }
     fd = open(DEV, O_NONBLOCK | O_RDWR);
     if (fd <= 0) {
       printf("Can not open %s (%d)\n", DEV, fd);
       rc = fd;
     }
     rc = ioctl(fd, mdnum, mdstate);
-    if (rc != 0) {
-      printf("Error calling I/O command %d 0x%lx\n", mdnum, mdstate);
-    }
+    printf("Result: 0x%lx\n", mdstate);
   } else {
     rc = 0xff;
-    printf("Usage: <module-number> <module-state>\n");
+    printf("Usage: <module-number> [<module-state>]\n");
   }
 }
