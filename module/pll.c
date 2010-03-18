@@ -78,7 +78,7 @@ pll_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
 {
   int rc;
 
-  if (cmd == 0) {
+  if (cmd == 1) {
     DBG("Start transaction for the PLLC1\n");
     rc = pll_transaction(PLLC1_BASE, 1, arg);
   } else {
