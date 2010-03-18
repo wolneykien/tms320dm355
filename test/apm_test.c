@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "../ioctl.h"
 
 int main (int narg, char **argv, char **arge)
 {

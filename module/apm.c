@@ -2,7 +2,6 @@
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/miscdevice.h>
-#include "../ioctl.h"
 #include <linux/device.h>
 #include <linux/kernel.h>
 
