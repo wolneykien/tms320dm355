@@ -13,7 +13,7 @@
 /* Include PSC memory map definitions */
 #include "psc.h"
 
-#define DRIVER_NAME "apm"
+#define DRIVER_NAME "psc"
 
 #ifdef DEBUG
 #define DBG(fmt,args...) printk(KERN_DEBUG DRIVER_NAME ": " fmt , ## args)
@@ -28,18 +28,8 @@
 
 #define ERROR(fmt,args...) printk(KERN_ERR DRIVER_NAME ": " fmt , ## args)
 
-/*
- * The apm_bios device is one of the misc char devices.
- * This is its minor number.
- */
-#define APM_MINOR_DEV	134
-
 static const char driver_version[] = "1.1";	/* no spaces */
 
-/*
- * apm_ioctl - handle APM ioctl
- *
- */
 #define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
 
 /* Returns the value of a given PSC register (offset) */
@@ -155,8 +145,12 @@ static unsigned long get_module_state(int mdnum)
   return read_psc_part(MDSTAT + REGISTER_SIZE * mdnum, MDSTAT_STATE);
 }
 
+/*
+ * psc_ioctl - handle PSC ioctl
+ *
+ */
 static int
-apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
+psc_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
 {
   int rc;
 
@@ -171,52 +165,52 @@ apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
   return rc;
 }
 
-static int apm_release(struct inode * inode, struct file * filp)
+static int misc_release(struct inode * inode, struct file * filp)
 {
         DBG("Release the device\n");
 	return 0;
 }
 
-static int apm_open(struct inode * inode, struct file * filp)
+static int misc_open(struct inode * inode, struct file * filp)
 {
         DBG("Open the device\n");
         return 0;
 }
 
-static struct file_operations apm_bios_fops = {
+static struct file_operations psc_fops = {
 	.owner		= THIS_MODULE,
-	.ioctl		= apm_ioctl,
-	.open		= apm_open,
-	.release	= apm_release,
+	.ioctl		= psc_ioctl,
+	.open		= misc_open,
+	.release	= misc_release,
 };
 
-static struct miscdevice apm_device = {
-	.minor		= APM_MINOR_DEV,
-	.name		= "apm_bios",
-	.fops		= &apm_bios_fops
+static struct miscdevice psc_device = {
+	.minor		= MISC_DYNAMIC_MINOR,
+	.name		= "psc",
+	.fops		= &psc_fops
 };
 
 
-static int __init apm_init(void)
+static int __init psc_init(void)
 {
 	int ret;
 
 	DBG("Register the device\n");
-	if ((ret = misc_register(&apm_device)) != 0) {
+	if ((ret = misc_register(&psc_device)) != 0) {
 	  ERROR("Unable to register the device\n");
 	}
 
 	return ret;
 }
 
-static void __exit apm_exit(void)
+static void __exit psc_exit(void)
 {
         DBG("Unregister the device\n");
-	misc_deregister(&apm_device);
+	misc_deregister(&psc_device);
 }
 
-module_init(apm_init);
-module_exit(apm_exit);
+module_init(psc_init);
+module_exit(psc_exit);
 
 MODULE_AUTHOR("Paul Wolneykien");
 MODULE_DESCRIPTION("Power and clock control for ARM DaVinci");
