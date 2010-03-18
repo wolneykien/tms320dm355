@@ -103,6 +103,12 @@ static int pll_transaction(unsigned long base,
     write_reg_part(base, PLLCTL, PLLCTL_PLLEN, 1);
   }
 
+  DBG("Calibrating the delays...\n");
+  calibrate_delay();
+  DBG("BogoMIPS\t: %lu.%02lu\n\n",
+      loops_per_jiffy / (500000UL/HZ),
+      (loops_per_jiffy / (5000UL/HZ)) % 100);
+
   return 0;
 }
 
