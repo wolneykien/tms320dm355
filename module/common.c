@@ -68,3 +68,17 @@ static unsigned long write_reg_part_read(unsigned long base,
   write_reg_part(base, offs, mask, val);
   return read_reg(base, offs);
 }
+
+/* Releases the specified device */
+static int misc_release(struct inode * inode, struct file * filp)
+{
+        DBG("Release the device\n");
+	return 0;
+}
+
+/* Opens the specified device */
+static int misc_open(struct inode * inode, struct file * filp)
+{
+        DBG("Open the device\n");
+        return 0;
+}
