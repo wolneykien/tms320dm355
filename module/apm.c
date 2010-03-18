@@ -218,6 +218,6 @@ static void __exit apm_exit(void)
 module_init(apm_init);
 module_exit(apm_exit);
 
-MODULE_AUTHOR("Peter Saveliev");
-MODULE_DESCRIPTION("Advanced Power Management for ARM DaVinci");
+MODULE_AUTHOR("Paul Wolneykien");
+MODULE_DESCRIPTION("Power and clock control for ARM DaVinci");
 MODULE_LICENSE("GPL");
