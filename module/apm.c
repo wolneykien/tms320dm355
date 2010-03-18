@@ -136,7 +136,7 @@ static int change_module_state(int mdnum, unsigned long mdstate)
     DBG("Set 0x%lx state for the module #%d\n", mdstate, mdnum);
     set_next_module_state(mdnum, mdstate);
     /* Set the GOx bit in PTCMD to 0x1 to initiate the transition(s). */
-    DBG("Start power state transition for the module %d\n", mdnum);
+    DBG("Start power state transition for the module #%d\n", mdnum);
     start_module_state_transition();
     /* Wait for the GOSTATx bit in PTSTAT to clear to 0x0. The module
      * is only safely in the new state after the GOSTATx bit in
