@@ -27,7 +27,7 @@ int main (int narg, char **argv, char **arge)
       rc = fd;
     }
     rc = ioctl(fd, mdnum, mdstate);
-    printf("Result: 0x%lx\n", mdstate);
+    printf("Result: 0x%lx\n", rc);
   } else {
     rc = 0xff;
     printf("Usage: <module-number> [<module-state>]\n");
