@@ -15,80 +15,12 @@
 
 #define DRIVER_NAME "psc"
 
-#ifdef DEBUG
-#define DBG(fmt,args...) printk(KERN_DEBUG DRIVER_NAME ": " fmt , ## args)
-#define DBG_REG_FROM(name,val0) \
-  printk(KERN_DEBUG DRIVER_NAME ": 0x%x 0x%lx ->", name, val0)
-#define DBG_REG_TO(val) printk(" 0x%lx\n", val)
-#else
-#define DBG(fmt,args...) do { } while (0)
-#define DBG_REG_FROM(name,val0) do { } while (0)
-#define DBG_REG_TO(val) do { } while (0)
-#endif
+/* Common procedure */
+#include "common.c"
 
-#define ERROR(fmt,args...) printk(KERN_ERR DRIVER_NAME ": " fmt , ## args)
-
-static const char driver_version[] = "1.1";	/* no spaces */
-
-#define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
-
-/* Returns the value of a given PSC register (offset) */
-static unsigned long read_psc(unsigned long offs)
-{
-  return __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs);
-}
-
-/* Sets the value of a given PSC register (offset) */
-static void write_psc(unsigned long offs, unsigned long val)
-{
-  __REG(DAVINCI_PWR_SLEEP_CNTRL_BASE + offs) = val;
-}
-
-/* Sets and return the value of a given PSC register (offset) */
-static unsigned long write_read_psc(unsigned long offs, unsigned long val)
-{
-  write_psc(offs, val);
-  return read_psc(offs);
-}
-
-/* Tests the value of a given register (offset) with a bit-mask */
-static int test_psc(unsigned long offs, unsigned long mask)
-{
-  return read_psc(offs) & mask;
-}
-
-/* Reads the partial value of a PSC register (offset) */
-static unsigned long read_psc_part(unsigned long offs, unsigned long mask)
-{
-  return read_psc(offs) & mask;
-}
-
-/* Sets the partial value of a given PSC register (offset) */
-static void write_psc_part(unsigned long offs,
-			   unsigned long mask,
-			   unsigned long val)
-{
-  write_psc(offs, (read_psc(offs) & ~mask) | (val & mask));
-}
-
-/* Sets and returns the partial value of a given PSC register (offset) */
-static unsigned long write_read_psc_part(unsigned long offs,
-					 unsigned long mask,
-					 unsigned long val)
-{
-  write_psc_part(offs, mask, val);
-  return read_psc_part(offs, mask);
-}
-
-/* Sets the partial value of a given PSC register (offset) and returns
- * the whole value */
-static unsigned long write_psc_part_read(unsigned long offs,
-					 unsigned long mask,
-					 unsigned long val)
-{
-  write_psc_part(offs, mask, val);
-  return read_psc(offs);
-}
+#define test_psc(offs) test_reg(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs)
+#define write_psc_part(offs, mask, val)			\
+  write_reg_part(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs, mask, val)
 
 /* Waits for a module state transition to finish up */
 static int wait_for_transitions(void)
