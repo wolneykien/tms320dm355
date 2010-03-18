@@ -148,98 +148,12 @@ static int change_module_state(int mdnum, unsigned long mdstate)
   return rc;
 }
 
-#define PDCTL1_ADDR 0x01c40900
-#define PDCTL1      __REG(PDCTL1_ADDR)
-#define PLL1_ADDR   0x01c40910
-#define PLL1_PLLM   __REG(PLL1_ADDR)
-
-// PDCTL register bits
-#define PLLEN		0
-#define PLLPWRDN	1
-#define PLLRST		3
-#define PLLDIS		4
-#define PLLENSRC	5
-#define CLKMODE		8
-
-/*
- *  sprueh7d.pdf 
- *  table 22, page 46
- */
-#define SDRCR_ADDR  0x2000000c
-#define SDRCR       __REG(SDRCR_ADDR)
-
-/*
- *  sprufb3.pdf
- *  table 9-3, page 117
- */
-#define USBCTL_ADDR 0x01c40034
-#define USBCTL      __REG(USBCTL_ADDR)
-
 static int
 apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
 {
-        DBG("I/O cmd %d\n", cmd);
+  DBG("I/O cmd %d 0x%lx\n", cmd, arg);
 
-	switch (cmd) {
-	case APM_IOC_DDRSR_ON:
-		SDRCR &= ~(1 << 23);
-		SDRCR |= (1 << 31);
-		SDRCR |= (1 << 30);
-		break;
-	case APM_IOC_DDRSR_OFF:
-		SDRCR &= ~(1 << 30);
-		SDRCR &= ~(1 << 31);
-		break;
-	case APM_IOC_PLLM_BYPASS:
-		PDCTL1 &= ~(1 << PLLEN);
-		udelay(10);
-		PDCTL1 |= (1 << PLLRST);
-		break;
-	case APM_IOC_PLLM_PLL:
-		PDCTL1 &= ~(1 << CLKMODE);
-		PDCTL1 &= ~(1 << PLLENSRC);
-		PDCTL1 &= ~(1 << PLLEN);
-		udelay(10);
-		PDCTL1 |= (1 << PLLRST);
-		PDCTL1 |= (1 << PLLDIS);
-		PDCTL1 &= ~(1 << PLLPWRDN);
-		PDCTL1 &= ~(1 << PLLDIS);
-		udelay(10);
-		PDCTL1 &= ~(1 << PLLRST);
-		udelay(300);
-		PDCTL1 |= (1 << PLLEN);;
-		break;
-	case APM_IOC_PLLM_91:
-		PDCTL1 &= ~(1 << PLLEN );
-		udelay(10);
-		PDCTL1 |= (1 << PLLRST);
-		PLL1_PLLM = 91;
-		udelay(10);
-		PDCTL1 &= ~(1 << PLLRST);
-		udelay(300);
-		PDCTL1 |= (1 << PLLEN);
-		break;
-	case APM_IOC_PLLM_179:
-		PDCTL1 &= ~(1 << PLLEN );
-		udelay(10);
-		PDCTL1 |= (1 << PLLRST);
-		PLL1_PLLM = 179;
-		udelay(10);
-		PDCTL1 &= ~(1 << PLLRST);
-		udelay(300);
-		PDCTL1 |= (1 << PLLEN);
-		break;
-	case APM_IOC_USB_OFF:
-		USBCTL |= 1;
-		break;
-	case APM_IOC_USB_ON:
-		USBCTL &= ~( 1);
-		break;
-	default:
-	  return -EINVAL;
-	}
-
-	return 0;
+  return change_module_state(cmd, arg);
 }
 
 static int apm_release(struct inode * inode, struct file * filp)
