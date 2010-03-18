@@ -14,6 +14,7 @@
 #include "psc.h"
 
 #define DRIVER_NAME "psc"
+#define PSC_MINOR 240
 
 /* Common procedures */
 #include "common.c"
@@ -110,7 +111,7 @@ static struct file_operations psc_fops = {
 };
 
 static struct miscdevice psc_device = {
-	.minor		= MISC_DYNAMIC_MINOR,
+	.minor		= PSC_MINOR,
 	.name		= "psc",
 	.fops		= &psc_fops
 };

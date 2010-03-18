@@ -14,6 +14,7 @@
 #include "pll.h"
 
 #define DRIVER_NAME "pll"
+#define PLL_MINOR 241
 
 /* Common procedures */
 #include "common.c"
@@ -113,7 +114,7 @@ static struct file_operations pll_fops = {
 };
 
 static struct miscdevice pll_device = {
-	.minor		= MISC_DYNAMIC_MINOR,
+	.minor		= PLL_MINOR,
 	.name		= "pll",
 	.fops		= &pll_fops
 };
