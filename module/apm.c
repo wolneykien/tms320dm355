@@ -6,8 +6,9 @@
 #include <linux/kernel.h>
 
 #include <asm/system.h>
-#include <asm/arch/hardware.h>
 #include <linux/delay.h>
+#include <mach/hardware.h>
+#include <mach/io.h>
 
 /* Include PSC memory map definitions */
 #include "psc.h"
@@ -39,6 +40,7 @@ static const char driver_version[] = "1.1";	/* no spaces */
  * apm_ioctl - handle APM ioctl
  *
  */
+#define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
 
 /* Returns the value of a given PSC register (offset) */
 static unsigned long read_psc(unsigned long offs)
