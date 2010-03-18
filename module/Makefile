@@ -1,6 +1,7 @@
 LINUX_DIR=/lib/modules/$(shell uname -r)/build
 
 obj-m += psc.o
+obj-m += pll.o
 
 EXTRA_CFLAGS += $(OTHER_CFLAGS)
 
