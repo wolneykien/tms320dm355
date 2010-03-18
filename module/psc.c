@@ -102,18 +102,6 @@ psc_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
   return rc;
 }
 
-static int misc_release(struct inode * inode, struct file * filp)
-{
-        DBG("Release the device\n");
-	return 0;
-}
-
-static int misc_open(struct inode * inode, struct file * filp)
-{
-        DBG("Open the device\n");
-        return 0;
-}
-
 static struct file_operations psc_fops = {
 	.owner		= THIS_MODULE,
 	.ioctl		= psc_ioctl,
