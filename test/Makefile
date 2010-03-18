@@ -1,11 +1,10 @@
-all: apm_test
+all: psc_test
 
-apm_test: apm_test.c
-	$(CROSS_COMPILE)gcc -o apm_test apm_test.c
+psc_test: psc_test.c
+	$(CROSS_COMPILE)gcc -o psc_test psc_test.c
 
 clean:
-	[ ! -f apm_test ] || rm apm_test
+	[ ! -f psc_test ] || rm psc_test
 
 install:
-	install -D -m0755 apm_test $(PREFIX)/bin/apm_test
-	install -D -m0755 apm_run_tests $(PREFIX)/bin/apm_run_tests
+	install -D -m0755 psc_test $(PREFIX)/bin/psc_test
