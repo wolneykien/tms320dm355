@@ -15,8 +15,10 @@
 
 #define DRIVER_NAME "psc"
 
-/* Common procedure */
+/* Common procedures */
 #include "common.c"
+
+static const char driver_version[] = "1.2";
 
 #define test_psc(offs) test_reg(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs)
 #define write_psc_part(offs, mask, val)			\
