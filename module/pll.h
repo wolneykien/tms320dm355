@@ -52,3 +52,6 @@
 #define PLLCTL_PLLDIS   0x10
 #define PLLCTL_PLLENSRC 0x20
 #define PLLCTL_CLKMODE  0x100
+
+/* The PLLM register bit-map */
+#define PLLM_PLLM 0xff
