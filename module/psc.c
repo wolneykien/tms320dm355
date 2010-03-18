@@ -150,5 +150,5 @@ module_init(psc_init);
 module_exit(psc_exit);
 
 MODULE_AUTHOR("Paul Wolneykien");
-MODULE_DESCRIPTION("Power and clock control for ARM DaVinci");
+MODULE_DESCRIPTION("Power control for ARM DaVinci");
 MODULE_LICENSE("GPL");
