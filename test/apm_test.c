@@ -3,73 +3,31 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "../ioctl.h"
+#include <stdlib.h>
+
+#define DEV "/dev/misc/apm_bios"
 
 int main (int narg, char **argv, char **arge)
 {
-	int fd,ret,ctl;
-	char arg;
+  int fd;
+  int mdnum;
+  unsigned long mdstate;
+  int rc;
 
-	if (narg < 2)
-	{
-		arg = '-';
-	} else {
-		arg = argv[1][0];
-	}
-
-	switch (arg)
-	{
-		case 'b':
-			ctl = APM_IOC_PLLM_BYPASS;
-			break;
-		case 'B':
-			ctl = APM_IOC_PLLM_PLL;
-			break;
-		case 'c':
-			ctl = APM_IOC_PLLM_91;
-			break;
-		case 'C':
-			ctl = APM_IOC_PLLM_179;
-			break;
-		case 'u':
-			ctl = APM_IOC_USB_OFF;
-			break;
-		case 'U':
-			ctl = APM_IOC_USB_ON;
-			break;
-		case 'd':
-			ctl = APM_IOC_DDRSR_ON;
-			break;
-		case 'D':
-			ctl = APM_IOC_DDRSR_OFF;
-			break;
-		default:
-			printf("Usage: %s <arg>. Possible args:\n\
-\tb - PLL bypass mode on\n\
-\tB - PLL bypass mode off\n\
-\tc - minimal PLLM1 multiplier\n\
-\tC - maximal PLLM1 multiplier\n\
-\tu - power down USB PHY\n\
-\tU - power up USB PHY\n\
-\td - turn on DDR self-refresh (w/o DDR PHY power down)\n\
-\tD - turn off DDR self-refresh\n\
-\n",argv[0]);
-			return 255;
-	}
-
-	fd = open("/dev/misc/apm_bios",O_NONBLOCK | O_RDWR);
-	if (0 >= fd)
-	{
-		printf("can not open /dev/misc/apm_bios\n");
-		return fd;
-	}
-
-	ret = ioctl(fd,ctl);
-	if (0 != ret)
-	{
-		printf("error callin' ioctl\n");
-		return ret;
-	}
-
-	return 0;
+  if (narg == 3) {
+    mdnum = atoi(argv[1]);
+    mdstate = (unsigned long)atoi(argv[2]);
+    fd = open(DEV, O_NONBLOCK | O_RDWR);
+    if (fd <= 0) {
+      printf("Can not open %s (%d)\n", DEV, fd);
+      rc = fd;
+    }
+    rc = ioctl(fd, mdnum, mdstate);
+    if (rc != 0) {
+      printf("Error calling I/O command %d 0x%lx\n", mdnum, mdstate);
+    }
+  } else {
+    rc = 0xff;
+    printf("Usage: <module-number> <module-state>\n");
+  }
 }
