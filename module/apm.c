@@ -162,7 +162,7 @@ apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
     DBG("Try to set state 0x%lx for the module #%d\n", arg, cmd);
     rc = change_module_state(cmd, arg);
   } else {
-    DBG("Read the current state 0x%lx of the module #%d\n", cmd);
+    DBG("Read the current state of the module #%d\n", cmd);
     rc (int) get_module_state(cmd);
   }
 
