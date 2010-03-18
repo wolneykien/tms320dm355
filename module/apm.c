@@ -163,7 +163,7 @@ apm_ioctl(struct inode * inode, struct file *filp, u_int cmd, u_long arg)
     rc = change_module_state(cmd, arg);
   } else {
     DBG("Read the current state of the module #%d\n", cmd);
-    rc (int) get_module_state(cmd);
+    rc = (int) get_module_state(cmd);
   }
 
   return rc;
