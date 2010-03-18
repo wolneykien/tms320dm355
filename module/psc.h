@@ -209,4 +209,12 @@
 /* PTCMD bit-map */
 #define PTCMD_GO 0x1
 
+/* MDSTAT bit-map */
+#define MDSTAT_STATE 0x3f
+#define MDSTAT_MRST 0x400
+#define MDSTAT_MRSTDONE 0x800
+#define MDSTAT_MCKOUT 0x1000
+#define MDSTAT_EMURST 0x10000
+#define MDSTAT_EMUIHB 0x20000
+
 #endif /* __ASM_ARCH_PSC_H */
