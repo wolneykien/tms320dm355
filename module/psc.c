@@ -20,7 +20,10 @@
 
 static const char driver_version[] = "1.2";
 
-#define test_psc(offs) test_reg(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs)
+#define test_psc(offs, mask) \
+  test_reg(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs, mask)
+#define read_psc_part(offs, mask) \
+  read_reg_part(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs, mask)
 #define write_psc_part(offs, mask, val)			\
   write_reg_part(DAVINCI_PWR_SLEEP_CNTRL_BASE, offs, mask, val)
 
