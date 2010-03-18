@@ -23,7 +23,7 @@ static const char driver_version[] = "1.0";
 /* Transites the PLL controller to a new state */
 static int pll_transaction(unsigned long base,
 			   unsigned long refclk,
-			   byte mul)
+			   unsigned short mul)
 {
   /* In PLLCTL, write CLKMODE = 0 (internal oscillator) or 1
    * (input clock) to select the type of reference clock. Write
@@ -37,13 +37,13 @@ static int pll_transaction(unsigned long base,
   write_reg_part(base, PLLCTL, PLLCTL_PLLEN, 0);
   /* Wait at least 4 reference clock cycles for the PLLEN mux
    * to change.*/
-  do { udelay(400) } while (!test_reg(base, PLLCTL, PLLCTL_PLLEN));
+  do { udelay(400); } while (!test_reg(base, PLLCTL, PLLCTL_PLLEN));
   /* In PLLCTL, write PLLRST = 1 (assert PLL reset). */
   write_reg_part(base, PLLCTL, PLLCTL_PLLRST, 1);
   /* In PLLCTL, write PLLDIS = 1 (assert PLL disable). */
   write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 1);
   /* In PLLCTL, write PLLPWRDN = 0 (power up the PLL). */
-  write_reg_part(base, PLLCTL, PLLCTL_PLLPWRDN, 0);
+  write_reg_part(base, PLLCTL, PLLCTL_PWRDN, 0);
   /* In PLLCTL, write PLLDIS = 0 (de-assert PLL disable). */
   write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 0);
   /* If necessary, write PREDIV, POSTDIV, and PLLM to set divider
@@ -97,7 +97,7 @@ static struct file_operations pll_fops = {
 	.release	= misc_release,
 };
 
-static struct miscdevice psc_device = {
+static struct miscdevice pll_device = {
 	.minor		= MISC_DYNAMIC_MINOR,
 	.name		= "pll",
 	.fops		= &pll_fops
