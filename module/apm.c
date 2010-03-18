@@ -104,12 +104,14 @@ static unsigned long write_psc_part_read(unsigned long offs,
 /* Waits for a module state transition to finish up */
 static int wait_for_transitions(void)
 {
-  while (test_psc(PTSTAT, PTSTAT_GOSTAT)) {
+  int rc;
+
+  while ((rc = test_psc(PTSTAT, PTSTAT_GOSTAT))) {
     DBG("Wait while for a current power transition to finish\n");
     mdelay(100);
   }
 
-  return 0;
+  return rc;
 }
 
 /* Sets the value for next state a given module (number) */
