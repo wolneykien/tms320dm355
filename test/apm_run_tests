@@ -1,8 +1,0 @@
-#!/bin/sh
-
-echo 8 > /proc/sys/kernel/printk
-insmod /lib/modules/*/extra/apm.ko
-
-apm_test d
-
-rmmod apm
