@@ -43,3 +43,12 @@
 #define SYSTAT 0x150
 /* Divider 4 control-divider for SYSCLK4 */
 #define PLLDIV4 0x160
+
+
+/* The PLLCTL register bit-map */
+#define PLLCTL_PLLEN    0x1
+#define PLLCTL_PWRDN    0x2
+#define PLLCTL_PLLRST   0x8
+#define PLLCTL_PLLDIS   0x10
+#define PLLCTL_PLLENSRC 0x20
+#define PLLCTL_CLKMODE  0x100
