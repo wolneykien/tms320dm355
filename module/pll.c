@@ -98,7 +98,7 @@ static int pll_transaction(unsigned long base,
     ERROR("PLLEN in not clear\n");
   }
   /* In PLLCTL, write PLLEN = 1 to (switch from bypass mode to PLL mode). */
-  if (mul == 0) {
+  if (mul > 0) {
     DBG("Set PLLEN to 1 (PLL mode)\n");
     write_reg_part(base, PLLCTL, PLLCTL_PLLEN, 1);
   }
