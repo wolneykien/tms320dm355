@@ -9,6 +9,8 @@
 #include <linux/delay.h>
 #include <mach/hardware.h>
 #include <mach/io.h>
+#include <linux/kobject.h>
+#include <linux/sysfs.h>
 
 /* Include PSC memory map definitions */
 #include "pll.h"
@@ -146,6 +148,8 @@ static struct miscdevice pll_device = {
 	.fops		= &pll_fops
 };
 
+struct kobject *pll_kobj;
+struct kobject *pll_power;
 
 static int __init pll_init(void)
 {
@@ -155,6 +159,17 @@ static int __init pll_init(void)
 	if ((ret = misc_register(&pll_device)) != 0) {
 	  ERROR("Unable to register the device\n");
 	}
+	DBG("Register the PLL kernel object\n");
+	if ((pll_kobj = kobject_create_and_add("pll", NULL))) {
+	  DBG("Register the PLL power kernel object\n");
+	  if (! (pll_power = kobject_create_and_add("power", pll_kobj))) {
+	    ERROR("Unable to create PLL power kernel object\n");
+	  ret = -ENOMEM;
+	  }
+	} else {
+	  ERROR("Unable to create PLL kernel object\n");
+	  ret = -ENOMEM;
+	}
 
 	return ret;
 }
@@ -163,6 +178,16 @@ static void __exit pll_exit(void)
 {
         DBG("Unregister the device\n");
 	misc_deregister(&pll_device);
+	if (pll_kobj) {
+	  DBG("Unregister the PLL power kernel object\n");
+	  kobject_put(pll_power);
+	  pll_power = NULL;
+	}
+	if (pll_kobj) {
+	  DBG("Unregister the PLL kernel object\n");
+	  kobject_put(pll_kobj);
+	  pll_kobj = NULL;
+	}
 }
 
 module_init(pll_init);
