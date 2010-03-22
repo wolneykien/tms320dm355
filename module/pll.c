@@ -11,6 +11,7 @@
 #include <mach/io.h>
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
+#include <linux/stat.h>
 
 /* Include PSC memory map definitions */
 #include "pll.h"
@@ -149,7 +150,90 @@ static struct miscdevice pll_device = {
 };
 
 struct kobject *pll_kobj;
-struct kobject *pll_power;
+struct kobject *pll1_kobj;
+struct kobject *pll2_kobj;
+
+static ssize_t power_state_show(struct kobject *kobj,
+				struct kobj_attribute *attr,
+				char *buf)
+{
+  unsigned long state;
+  DBG("Read PLLPWRDN register\n");
+  if (kobj->parent == pll1_kobj) {
+    state = read_reg_part(PLLC1_BASE, PLLCTL, PLLCTL_PWRDN);
+  } else if (kobj->parent == pll2_kobj) {
+    state = read_reg_part(PLLC2_BASE, PLLCTL, PLLCTL_PWRDN);
+  } else {
+    ERROR("No base address for PLLC %s\n", kobj->name);
+    return -ENOENT;
+  }
+
+  return sprintf(buf, "%d\n", state == 0 ? 1 : 0);
+}
+
+static ssize_t power_state_store(struct kobject *kobj,
+				 struct kobj_attribute *attr,
+				 const char *buf, size_t count)
+{
+  unsigned long state;
+
+  if (count > 0) {
+    if (count > 2) {
+      return -ENOENT;
+    }
+    if (strncmp(buf, "0", 1) == 0) {
+      state = 1;
+    } else {
+      state = 0;
+    }
+    DBG("Write PLLPWRDN register: %d\n", state);
+    if (kobj->parent == pll1_kobj) {
+      write_reg_part(PLLC1_BASE, PLLCTL, PLLCTL_PWRDN, state);
+    } else if (kobj->parent == pll2_kobj) {
+      write_reg_part(PLLC2_BASE, PLLCTL, PLLCTL_PWRDN, state);
+    } else {
+      ERROR("No base address for PLLC %s\n", kobj->name);
+      return -ENOENT;
+    }
+  }
+
+  return count;
+}
+
+static struct kobject* register_pll_kobj(struct kobject *parent,
+					 const char *name)
+{
+  struct kobject *pll_kobj;
+  struct kobject *power;
+  static struct kobj_attribute power_state =
+    __ATTR(state, 0644, power_state_show, power_state_store);
+  static struct attribute * power_attrs[] =
+    {
+      &power_state.attr,
+      NULL
+    };
+  static struct attribute_group power_attr_group =
+    {
+      .attrs = power_attrs,
+    };
+
+  DBG("Register the %s PLL kernel object\n", name);
+  if ((pll_kobj = kobject_create_and_add(name, parent))) {
+    DBG("Register the %s PLL power kernel object\n", name);
+    if ((power = kobject_create_and_add("power", pll_kobj))) {
+      DBG("Register %s PLL power attributes\n", name);
+      if (sysfs_create_group(power,  &power_attr_group) != 0) {
+	ERROR("Unable to register %s PLL power attributes\n", name);
+      }
+    } else {
+      ERROR("Unable to create %s PLL power kernel object\n", name);
+    }
+  } else {
+    ERROR("Unable to create %s PLL kernel object\n", name);
+  }
+
+  return pll_kobj;
+}
 
 static int __init pll_init(void)
 {
@@ -159,12 +243,12 @@ static int __init pll_init(void)
 	if ((ret = misc_register(&pll_device)) != 0) {
 	  ERROR("Unable to register the device\n");
 	}
-	DBG("Register the PLL kernel object\n");
+	DBG("Register the main PLL kernel object\n");
 	if ((pll_kobj = kobject_create_and_add("pll", NULL))) {
-	  DBG("Register the PLL power kernel object\n");
-	  if (! (pll_power = kobject_create_and_add("power", pll_kobj))) {
-	    ERROR("Unable to create PLL power kernel object\n");
-	  ret = -ENOMEM;
+	  pll1_kobj = register_pll_kobj(pll_kobj, "pllc1");
+	  pll2_kobj = register_pll_kobj(pll_kobj, "pllc2");
+	  if (pll1_kobj == NULL || pll2_kobj == NULL) {
+	    ret = -ENOMEM;
 	  }
 	} else {
 	  ERROR("Unable to create PLL kernel object\n");
@@ -178,11 +262,6 @@ static void __exit pll_exit(void)
 {
         DBG("Unregister the device\n");
 	misc_deregister(&pll_device);
-	if (pll_kobj) {
-	  DBG("Unregister the PLL power kernel object\n");
-	  kobject_put(pll_power);
-	  pll_power = NULL;
-	}
 	if (pll_kobj) {
 	  DBG("Unregister the PLL kernel object\n");
 	  kobject_put(pll_kobj);
