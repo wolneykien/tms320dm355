@@ -155,6 +155,28 @@ static unsigned long read_current_mul(unsigned long base)
   return read_reg_part(base, PLLM, PLLM_PLLM);
 }
 
+/* Controls the power state of a given PLLC (base) */
+static int set_power_state(unsigned long base, int state)
+{
+  int rc;
+
+  if (state && test_reg(base, PLLCTL, PLLCTL_PWRDN)) {
+    if ((rc = pll_wakeup(base)) == 0) {
+      calibrate();
+    }
+  } else if (!state && !test_reg(base, PLLCTL, PLLCTL_PWRDN)) {
+    if ((rc = pll_bypass(base, 1)) == 0) {
+      DBG("Write PLLPWRDN register: %d\n", 1);
+      write_reg_part(base, PLLCTL, PLLCTL_PWRDN, 1);
+      calibrate();
+    }
+  } else {
+    DBG("Leave PLL power state unchanged\n");
+  }
+
+  return rc;
+}
+
 /*
  * pll_ioctl - handle PLL ioctl
  *
