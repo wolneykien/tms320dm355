@@ -158,7 +158,7 @@ static unsigned long read_current_mul(unsigned long base)
 /* Controls the power state of a given PLLC (base) */
 static int set_power_state(unsigned long base, int state)
 {
-  int rc;
+  int rc = 0;
 
   if (state && test_reg(base, PLLCTL, PLLCTL_PWRDN)) {
     if ((rc = pll_wakeup(base)) == 0) {
@@ -244,15 +244,15 @@ static ssize_t power_state_store(struct kobject *kobj,
       return -ENOENT;
     }
     if (strncmp(buf, "0", 1) == 0) {
-      state = 1;
-    } else {
       state = 0;
+    } else {
+      state = 1;
     }
-    DBG("Write PLLPWRDN register: %d\n", state);
+    DBG("Write PLLPWRDN register: %ld\n", state);
     if (kobj->parent == pll1_kobj) {
-      write_reg_part(PLLC1_BASE, PLLCTL, PLLCTL_PWRDN, state);
+      set_power_state(PLLC1_BASE, state);
     } else if (kobj->parent == pll2_kobj) {
-      write_reg_part(PLLC2_BASE, PLLCTL, PLLCTL_PWRDN, state);
+      set_power_state(PLLC2_BASE, state);
     } else {
       ERROR("No base address for PLLC %s\n", kobj->name);
       return -ENOENT;
