@@ -115,6 +115,14 @@ static int pll_transaction(unsigned long base,
   return 0;
 }
 
+/* Returns the current multiplicator value of a given PLLC (base) */
+static unsigned long read_current_mul(unsigned long base)
+{
+  DBG("Read PLLM register\n");
+
+  return read_reg_part(base, PLLM, PLLM_PLLM);
+}
+
 /*
  * pll_ioctl - handle PLL ioctl
  *
