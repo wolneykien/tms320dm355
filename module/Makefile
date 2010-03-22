@@ -5,6 +5,8 @@ obj-m += psc.o
 pllm-objs := pll.o calibrate.o delay.o
 obj-m += pllm.o
 
+obj-m += scm.o
+
 EXTRA_CFLAGS += $(OTHER_CFLAGS)
 
 all: calibrate.c delay.S
