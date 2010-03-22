@@ -33,10 +33,8 @@ static int udelay_value = 400; //TODO: module param
 /* Lock cycle period */
 static int mdelay_value = 10; //TODO: module param
 
-/* Transites the PLL controller to a new state */
-static int pll_transaction(unsigned long base,
-			   unsigned long refclk,
-			   unsigned short mul)
+/* Sets bypass mode for a given PLLC (base) */
+static int pll_bypass(unsigned long base, unsigned long refclk)
 {
   int n = 0;
   int rc;
@@ -64,20 +62,59 @@ static int pll_transaction(unsigned long base,
     n++;
   } while ((rc = test_reg(base, PLLCTL, PLLCTL_PLLEN))
 	   && n < maxwait);
+
+  return rc;
+}
+
+/* Wake-up the given PLLC (base) */
+static int pll_wakeup(unsigned long base)
+{
+  /* In PLLCTL, write PLLRST = 1 (assert PLL reset). */
+  DBG("Set PLLRST to 1 (assert PLL reset)\n");
+  write_reg_part(base, PLLCTL, PLLCTL_PLLRST, 1);
+  /* In PLLCTL, write PLLDIS = 1 (assert PLL disable). */
+  DBG("Set PLLDIS to 1 (assert PLL disable)\n");
+  write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 1);
+  /* In PLLCTL, write PLLPWRDN = 0 (power up the PLL). */
+  DBG("Set PLLPWRDN to 0 (power up the PLL)\n");
+  write_reg_part(base, PLLCTL, PLLCTL_PWRDN, 0);
+  /* In PLLCTL, write PLLDIS = 0 (de-assert PLL disable). */
+  DBG("Set PLLDIS to 0 (de-assert PLL disable)\n");
+  write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 0);
+
+  return 0;
+}
+
+/* Sets the PLL mode for a given PLLC (base) */
+static int set_pll_mode(unsigned long base)
+{
+  DBG("Set PLLEN to 1 (PLL mode)\n");
+  write_reg_part(base, PLLCTL, PLLCTL_PLLEN, 1);
+}
+
+/* Renew the kernel loops_per_jiffy (BogoMIPS) value */
+static void calibrate(void)
+{
+  DBG("Calibrating the delays...\n");
+  calibrate_delay();
+  DBG("BogoMIPS\t: %lu.%02lu\n\n",
+      loops_per_jiffy / (500000UL/HZ),
+      (loops_per_jiffy / (5000UL/HZ)) % 100);
+}
+
+/* Transites the PLL controller to a new state */
+static int pll_transaction(unsigned long base,
+			   unsigned long refclk,
+			   unsigned short mul)
+{
+  int rc;
+
+  rc = pll_bypass(base, refclk);
   DBG("PLLCTL: 0x%lx\n", read_reg(base, PLLCTL));
   if (rc == 0) {
-    /* In PLLCTL, write PLLRST = 1 (assert PLL reset). */
-    DBG("Set PLLRST to 1 (assert PLL reset)\n");
-    write_reg_part(base, PLLCTL, PLLCTL_PLLRST, 1);
-    /* In PLLCTL, write PLLDIS = 1 (assert PLL disable). */
-    DBG("Set PLLDIS to 1 (assert PLL disable)\n");
-    write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 1);
-    /* In PLLCTL, write PLLPWRDN = 0 (power up the PLL). */
-    DBG("Set PLLPWRDN to 0 (power up the PLL)\n");
-    write_reg_part(base, PLLCTL, PLLCTL_PWRDN, 0);
-    /* In PLLCTL, write PLLDIS = 0 (de-assert PLL disable). */
-    DBG("Set PLLDIS to 0 (de-assert PLL disable)\n");
-    write_reg_part(base, PLLCTL, PLLCTL_PLLDIS, 0);
+    rc = pll_wakeup(base);
+  }
+  if (rc == 0) {
     /* If necessary, write PREDIV, POSTDIV, and PLLM to set divider
      * and multiplier values. */
     if (mul > 0) {
@@ -102,17 +139,12 @@ static int pll_transaction(unsigned long base,
   }
   /* In PLLCTL, write PLLEN = 1 to (switch from bypass mode to PLL mode). */
   if (mul > 0) {
-    DBG("Set PLLEN to 1 (PLL mode)\n");
-    write_reg_part(base, PLLCTL, PLLCTL_PLLEN, 1);
+    rc = set_pll_mode(base);
   }
 
-  DBG("Calibrating the delays...\n");
-  calibrate_delay();
-  DBG("BogoMIPS\t: %lu.%02lu\n\n",
-      loops_per_jiffy / (500000UL/HZ),
-      (loops_per_jiffy / (5000UL/HZ)) % 100);
+  calibrate();
 
-  return 0;
+  return rc;
 }
 
 /* Returns the current multiplicator value of a given PLLC (base) */
