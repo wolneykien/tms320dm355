@@ -75,6 +75,45 @@ static struct attribute_group usb_attr_group =
     .attrs = usb_attrs,
   };
 
+static ssize_t wi_show(struct kobject *kobj,
+		       struct kobj_attribute *attr,
+		       char *buf)
+{
+  return sprintf(buf, "%d\n", 1);
+}
+
+void __wait_for_interrupt(void);
+
+static ssize_t wi_store(struct kobject *kobj,
+			struct kobj_attribute *attr,
+			const char *buf, size_t count)
+{
+  if (count > 0) {
+    if (count > 2) {
+      return -ENOENT;
+    }
+    if (strncmp(buf, "0", 1) == 0) {
+      DBG("Entering wait-for-interrupt mode\n");
+      __wait_for_interrupt();
+    }
+  }
+
+  return count;
+}
+
+struct kobject *clock_kobj;
+static struct kobj_attribute clock_state =
+  __ATTR(state, 0644, wi_show, wi_store);
+static struct attribute * clock_attrs[] =
+  {
+    &clock_state.attr,
+    NULL
+  };
+static struct attribute_group clock_attr_group =
+  {
+    .attrs = clock_attrs,
+  };
+
 static struct kobject* register_kobj(struct kobject *parent,
 				     const char *name,
 				     struct attribute_group *attr_group)
@@ -106,6 +145,10 @@ static int __init scm_init(void)
     if ((kobj = kobject_create_and_add("usb", arm_kobj))) {
       kobj = register_kobj(kobj, "power", &usb_attr_group);
     }
+  }
+
+  if (kobj) {
+    kobj = register_kobj(arm_kobj, "clock", &clock_attr_group);
   }
 
   if (arm_kobj == NULL || kobj == NULL) {
