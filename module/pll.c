@@ -34,6 +34,15 @@ static int udelay_value = 400; //TODO: module param
 /* Lock cycle period */
 static int mdelay_value = 10; //TODO: module param
 
+module_param_named(maxwait, maxwait, int, S_IRUGO);
+MODULE_PARM_DESC(maxwait, "Maximum number of wait cycles (default 10)");
+
+module_param_named(udelay, udelay_value, int, S_IRUGO);
+MODULE_PARM_DESC(udelay, "Wait cycle period, us (default 400)");
+
+module_param_named(mdelay, mdelay_value, int, S_IRUGO);
+MODULE_PARM_DESC(mdelay, "Lock cycle period, ms (default 10)");
+
 /* Renew the kernel loops_per_jiffy (BogoMIPS) value */
 static void calibrate(void)
 {
