@@ -13,4 +13,8 @@
 
 #define ERROR(fmt,args...) printk(KERN_ERR DRIVER_NAME ": " fmt , ## args)
 
-#define __REG(x)        (*((volatile unsigned long *)IO_ADDRESS(x)))
+/* Holds the memory map entry */
+struct memmap {
+  unsigned long pa;
+  void *va;
+};

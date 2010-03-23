@@ -8,7 +8,6 @@
 #include <asm/system.h>
 #include <linux/delay.h>
 #include <mach/hardware.h>
-#include <mach/io.h>
 
 /* Include PSC memory map definitions */
 #include "psc.h"

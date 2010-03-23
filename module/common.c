@@ -1,9 +1,49 @@
 #include "common.h"
+#include <asm/io.h>
+
+#define DEF_SIZE SZ_4K
+#define MAX_MAPS 10
+static int last_map = -1;
+static struct memmap memmap[MAX_MAPS];
+
+/* Returns a mapped address for a given base address */
+static void *get_va(unsigned long base)
+{
+  int i;
+
+  for(i = 0; i <= last_map; i++) {
+    if (memmap[i].pa == base) {
+      return memmap[i].va;
+    }
+  }
+  last_map++;
+  if (last_map < MAX_MAPS) {
+    memmap[last_map].pa = base;
+    DBG("Remap base address 0x%lx\n", base);
+    if ((memmap[last_map].va = ioremap(base, DEF_SIZE)) == NULL) {
+      ERROR("Unable to map base address 0x%lx\n", base);
+    }
+    return memmap[last_map].va;
+  } else {
+    ERROR("Memory map size exceeded\n");
+    return NULL;
+  }
+}
+
+/* Unmaps the memory map with the kernel */
+static void unmap_addrs()
+{
+  int i;
+
+  for(i = 0; i < last_map; i++) {
+    iounmap(memmap[i].va);
+  }
+}
 
 /* Returns the value of a given register (offset) */
 static unsigned long read_reg(unsigned long base, unsigned long offs)
 {
-  return __REG(base + offs);
+  return ioread32(get_va(base) + offs);
 }
 
 /* Sets the value of a given register (offset) */
@@ -11,7 +51,7 @@ static void write_reg(unsigned long base,
 		      unsigned long offs,
 		      unsigned long val)
 {
-  __REG(base + offs) = val;
+  iowrite32(val, get_va(base) + offs);
 }
 
 /* Sets and return the value of a given register (offset) */

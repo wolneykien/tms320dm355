@@ -8,7 +8,6 @@
 #include <asm/system.h>
 #include <linux/delay.h>
 #include <mach/hardware.h>
-#include <mach/io.h>
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
 #include <linux/stat.h>

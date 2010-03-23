@@ -8,11 +8,9 @@
 #include <asm/system.h>
 #include <linux/delay.h>
 #include <mach/hardware.h>
-#include <mach/io.h>
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
 #include <linux/stat.h>
-#include <asm/io.h>
 
 /* Include SCM memory map definitions */
 #include "scm.h"
@@ -222,6 +220,7 @@ static void __exit scm_exit(void)
   DBG("Unregister the kernel objects\n");
   kobject_put(arm_kobj);
   arm_kobj = NULL;
+  unmap_addrs();
 }
 
 module_init(scm_init);
