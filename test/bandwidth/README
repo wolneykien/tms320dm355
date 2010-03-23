@@ -1,0 +1,49 @@
+Hello,
+
+This is the Readme file for my program
+called "bandwidth".
+
+This is a benchmark that attempts to measure
+memory bandwidth. It's useful because hardware
+specifications can at times leave out key facts
+about a given piece of hardware. For instance,
+two computers may be using 60 nanosecond RAM,
+but one of the them may be accessing it 
+inefficiently. 
+
+You could run a non-artificial benchmark and 
+see that a general performance number is lower 
+on that machine, but that conceals the cause. 
+So you should run this program, whose purpose is 
+to help you pinpoint the cause of a 
+performance problem.
+
+Version 0.15a is significant, because it adds 
+assembly-language routines which are faster 
+than C code, and it measures time in microseconds
+rather than the previous whole seconds.
+
+The assembly code is in two flavors:
+	- x86 32-bit
+	- ARM
+
+Version 0.16 of bandwidth provides x86_64.
+
+Bandwidth performs these tests:
+	Level 1 cache sequential read
+	Level 1 cache sequential write 
+	Level 2 cache sequential read
+	Level 2 cache sequential write 
+	Main memory sequential read speed
+	Main memory sequential write speed
+	Video memory sequential read speed (x86 only)
+	Video memory sequential write speed (x86 only)
+	Speed of basic routines memset, memcpy, bzero. (x86 only)
+
+This program is provided without any warranty
+and AS-IS. See the file COPYING for details.
+
+Zack Smith
+fbui@comcast.net
+March 2010 
+

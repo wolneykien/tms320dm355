@@ -1,0 +1,20 @@
+This is bandwidth version 0.15
+Copyright (C) 2005,2007,2008 by Zack T Smith
+
+CPU vendor id = 'GenuineIntel'
+CPU has MMX.
+CPU MHz = 698.389
+
+All tests are 32-bit:
+L1 cache sequential read 2629.15 MB/sec 
+L1 cache sequential write 2284.93 MB/sec 
+L2 cache sequential read 2606.53 MB/sec 
+L2 cache sequential write 1630.16 MB/sec 
+Main memory sequential read 448.524 MB/sec 
+Main memory sequential write 163.718 MB/sec 
+Framebuffer resolution: 1024x768, 16bpp
+Framebuffer memory sequential read 6.67951 MB/sec 
+Framebuffer memory sequential write 47.3954 MB/sec 
+Library function memset: 167.132 MB/sec 
+Library function memcpy: memcpy 155.556 MB/sec 
+Function: my_bzero 162.402 MB/sec 
