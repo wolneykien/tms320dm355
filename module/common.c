@@ -44,7 +44,10 @@ static void unmap_addrs()
 /* Returns the value of a given register (offset) */
 static unsigned long read_reg(unsigned long base, unsigned long offs)
 {
-  return ioread32(get_va(base) + offs);
+  unsigned long val;
+  val = ioread32(get_va(base) + offs);
+  DBG("(0x%lx)>: 0x%lx\n", base + offs, val);
+  return val;
 }
 
 /* Sets the value of a given register (offset) */
@@ -52,6 +55,7 @@ static void write_reg(unsigned long base,
 		      unsigned long offs,
 		      unsigned long val)
 {
+  DBG("(0x%lx)<: 0x%lx\n", base + offs, val);
   iowrite32(val, get_va(base) + offs);
 }
 
@@ -117,10 +121,6 @@ static void write_reg_part(unsigned long base,
 
   oldval = read_reg(base, offs);
   newval = (oldval & ~mask) | (shvall(mask, val) & mask);
-  DBG("(0x%lx): 0x%lx -> 0x%lx\n",
-      base + offs,
-      oldval,
-      newval);
   write_reg(base, offs, newval);
 }
 
