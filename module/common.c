@@ -71,10 +71,16 @@ static void write_reg_part(unsigned long base,
 			   unsigned long mask,
 			   unsigned long val)
 {
-  write_reg(base,
-	    offs,
-	    (read_reg(base, offs) & ~mask) \
-	    | (shvall(mask, val) & mask));
+  unsigned long oldval;
+  unsigned long newval;
+
+  oldval = read_reg(base, offs);
+  newval = (oldval & ~mask) | (shvall(mask, val) & mask);
+  DBG("(0x%lx): 0x%lx -> 0x%lx\n",
+      base + offs,
+      oldval,
+      newval);
+  write_reg(base, offs, newval);
 }
 
 /* Sets and returns the partial value of a given register (offset) */

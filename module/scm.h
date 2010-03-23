@@ -68,7 +68,7 @@
 
 /* SDRAM controller base address */
 #define SZ_32K 0x00008000
-#define DA8XX_CTL_BASE ((unsigned long) ioremap(0xb0000000, SZ_32K))
+#define DA8XX_CTL_BASE 0xb0000000
 
 /* SDRCR register */
 #define SDRCR 0x0c
