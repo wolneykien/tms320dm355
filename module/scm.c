@@ -218,7 +218,7 @@ static int __init scm_init(void)
 static void __exit scm_exit(void)
 {
   DBG("Unregister the kernel objects\n");
-  kobject_put(arm_kobj);
+  kobject_del(arm_kobj);
   arm_kobj = NULL;
   unmap_addrs();
 }
