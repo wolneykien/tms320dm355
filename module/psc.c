@@ -132,6 +132,7 @@ static void __exit psc_exit(void)
 {
         DBG("Unregister the device\n");
 	misc_deregister(&psc_device);
+	unmap_addrs();
 }
 
 module_init(psc_init);

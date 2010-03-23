@@ -421,9 +421,10 @@ static void __exit pll_exit(void)
 	misc_deregister(&pll_device);
 	if (pll_kobj) {
 	  DBG("Unregister the PLL kernel object\n");
-	  kobject_put(pll_kobj);
+	  kobject_del(pll_kobj);
 	  pll_kobj = NULL;
 	}
+	unmap_addrs();
 }
 
 module_init(pll_init);
