@@ -1,5 +1,6 @@
+
 all: psc_test pll_test
-#	make -C bandwidth AS=$(CROSS_COMPILE)gcc CC=$(CROSS_COMPILE)gcc bandwidth-arm
+	make -C bandwidth CROSS_COMPILE=$(CROSS_COMPILE) bandwidth-arm
 
 psc_test: psc_test.c
 	$(CROSS_COMPILE)gcc -o psc_test psc_test.c
@@ -15,4 +16,4 @@ clean:
 install:
 	install -D -m0755 psc_test $(PREFIX)/bin/psc_test
 	install -D -m0755 pll_test $(PREFIX)/bin/pll_test
-#	install -D -m0755 bandwidth/bandwidth $(PREFIX)/bin/bandwidth
+	install -D -m0755 bandwidth/bandwidth-arm $(PREFIX)/bin/bandwidth
