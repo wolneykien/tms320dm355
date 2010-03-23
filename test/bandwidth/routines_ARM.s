@@ -78,7 +78,7 @@ myloop:
 	str	r4, [r0, #140]
 	str	r4, [r0, #144]
 
-	sub	r1, #1
+	sub	r1, r1, #1
 	bgt	myloop
 
 # restore & return.
@@ -127,7 +127,7 @@ myloop2:
 	ldr	r4, [r0, #140]
 	ldr	r4, [r0, #144]
 
-	sub	r1, #1
+	sub	r1, r1, #1
  	bgt	myloop2
 
 # restore & return.
@@ -140,12 +140,12 @@ L2_reader:
 # save r4 and return address.
 	stmfd   sp!, {r4, r5, r6, r14}	
 
-	add	r0, #131072
+	add	r0, r0, #131072
 	mov	r5, r1
 	mov	r6, r0
 
 myloop3b:
-	sub	r0, #128
+	sub	r0, r0, #128
 	mov	r1, r5
 
 myloop3a:
@@ -183,7 +183,7 @@ myloop3a:
 	ldr	r4, [r0, #120]
 	ldr	r4, [r0, #124]
 
-	sub	r1, #1
+	sub	r1, r1, #1
  	bgt	myloop3a
 	
 	cmp	r0, r6
@@ -199,12 +199,12 @@ L2_writer:
 # save r4 and return address.
 	stmfd   sp!, {r4, r5, r6, r14}	
 
-	add	r0, #131072
+	add	r0, r0, #131072
 	mov	r5, r1
 	mov	r6, r0
 
 myloop4b:
-	sub	r0, #128
+	sub	r0, r0, #128
 	mov	r1, r5
 
 myloop4a:
@@ -242,7 +242,7 @@ myloop4a:
 	str	r4, [r0, #120]
 	str	r4, [r0, #124]
 
-	sub	r1, #1
+	sub	r1, r0, #1
  	bgt	myloop4a
 	
 	cmp	r0, r6
@@ -258,12 +258,12 @@ Main_reader:
 # save r4 and return address.
 	stmfd   sp!, {r4, r5, r6, r14}	
 
-	add	r0, #16777216
+	add	r0, r0, #16777216
 	mov	r5, r1
 	mov	r6, r0
 
 myloop5b:
-	sub	r0, #128
+	sub	r0, r0, #128
 	mov	r1, r5
 
 myloop5a:
@@ -301,7 +301,7 @@ myloop5a:
 	ldr	r4, [r0, #120]
 	ldr	r4, [r0, #124]
 
-	sub	r1, #1
+	sub	r1, r1, #1
  	bgt	myloop5a
 	
 	cmp	r0, r6
@@ -317,12 +317,12 @@ Main_writer:
 # save r4 and return address.
 	stmfd   sp!, {r4, r5, r6, r14}	
 
-	add	r0, #16777216
+	add	r0, r0, #16777216
 	mov	r5, r1
 	mov	r6, r0
 
 myloop6b:
-	sub	r0, #128
+	sub	r0, r0, #128
 	mov	r1, r5
 
 myloop6a:
@@ -360,7 +360,7 @@ myloop6a:
 	str	r4, [r0, #120]
 	str	r4, [r0, #124]
 
-	sub	r1, #1
+	sub	r1, r1, #1
  	bgt	myloop6a
 	
 	cmp	r0, r6
