@@ -68,7 +68,7 @@
 
 /* SDRAM controller base address */
 #define SZ_32K 0x00008000
-#define DA8XX_CTL_BASE 0xb0000000
+#define DDR_CTL_BASE 0x20000000
 
 /* SDRCR register */
 #define SDRCR 0x0c

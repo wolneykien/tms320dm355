@@ -115,7 +115,6 @@ static struct attribute_group clock_attr_group =
     .attrs = clock_attrs,
   };
 
-static unsigned long ddr_ctl_base;
 
 static ssize_t ddr_power_show(struct kobject *kobj,
 			      struct kobj_attribute *attr,
@@ -123,9 +122,9 @@ static ssize_t ddr_power_show(struct kobject *kobj,
 {
   unsigned long state;
 
-  DBG("SDRCR: 0x%lx\n", read_reg(ddr_ctl_base, SDRCR));
-  state = 2 - read_reg_part(ddr_ctl_base, SDRCR, SDRCR_SR_PD) \
-    - read_reg_part(ddr_ctl_base, SDRCR, SDRCR_LPMODEN);
+  DBG("SDRCR: 0x%lx\n", read_reg(DDR_CTL_BASE, SDRCR));
+  state = 2 - read_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_SR_PD) \
+    - read_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_LPMODEN);
   return sprintf(buf, "%ld\n", state);
 }
 
@@ -139,16 +138,16 @@ static ssize_t ddr_power_store(struct kobject *kobj,
     }
     if (strncmp(buf, "0", 1) == 0) {
       DBG("Entering DDR power-down mode\n");
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_SR_PD, 1);
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_LPMODEN, 1);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_SR_PD, 1);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_LPMODEN, 1);
     } else if (strncmp(buf, "1", 1) == 0) {
       DBG("Entering DDR self-refresh mode\n");
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_SR_PD, 0);
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_LPMODEN, 1);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_SR_PD, 0);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_LPMODEN, 1);
     } else {
       DBG("Entering normal DDR mode\n");
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_SR_PD, 0);
-      write_reg_part(ddr_ctl_base, SDRCR, SDRCR_LPMODEN, 0);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_SR_PD, 0);
+      write_reg_part(DDR_CTL_BASE, SDRCR, SDRCR_LPMODEN, 0);
     }
   }
 
@@ -193,9 +192,6 @@ struct kobject *arm_kobj;
 static int __init scm_init(void)
 {
   struct kobject *kobj = NULL;
-
-  ddr_ctl_base =
-    ((unsigned long) ioremap(DA8XX_CTL_BASE, SZ_32K));
 
   DBG("Register the kernel objects\n");
   if ((arm_kobj = kobject_create_and_add("arm", NULL))) {
