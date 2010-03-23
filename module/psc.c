@@ -6,7 +6,6 @@
 #include <linux/kernel.h>
 
 #include <asm/system.h>
-#include <asm/arch/hardware.h>
 #include <linux/delay.h>
 
 /* Include PSC memory map definitions */
