@@ -36,6 +36,7 @@ static void unmap_addrs()
   int i;
 
   for(i = 0; i < last_map; i++) {
+    DBG("Unmap base address 0x%lx\n", memmap[i].pa);
     iounmap(memmap[i].va);
   }
 }
